@@ -22,6 +22,10 @@ Puppet::Type.newtype(:rabbitmq_user) do
   newparam(:password) do
     desc 'User password to be set *on creation*'
   end
+  
+  newparam(:password_hash) do
+    desc 'User password hash to be set *on creation*'
+  end
 
   newproperty(:admin) do
     desc 'rather or not user should be an admin'
@@ -34,8 +38,8 @@ Puppet::Type.newtype(:rabbitmq_user) do
   end
 
   validate do
-    if self[:ensure] == :present and ! self[:password]
-      raise ArgumentError, 'must set password when creating user' unless self[:password]
+    if self[:ensure] == :present
+      raise ArgumentError, 'must set password when creating user' unless self[:password] || self[:password_hash]
     end
   end
 
