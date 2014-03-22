@@ -1,5 +1,6 @@
 require 'net/http'
 require 'json'
+require 'erb'
 
 class Rabbitmq_webapi
 
@@ -45,7 +46,12 @@ class Rabbitmq_webapi
   end
   
   def request(method,args)
-    uri = args[:uri]
+    if args[:uri_vars]
+	  args[:uri_vars].map! { |v| ERB::Util.u(v) }
+	  uri = args[:uri] % args[:uri_vars]
+	else
+	  uri = args[:uri]
+	end
 	result = {}
     request = HTTP_MAP[method.to_sym].new(uri,initheader = {'Content-Type' =>'application/json'})
 	data = args[:data]

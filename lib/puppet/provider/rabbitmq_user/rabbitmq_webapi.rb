@@ -33,7 +33,8 @@ Puppet::Type.type(:rabbitmq_user).provide(:rabbitmq_webapi) do
 	  data[:tags] = resource[:name]
 	end
     response = api.put({
-	  :uri => "/api/users/#{resource[:name]}",
+	  :uri => "/api/users/%s",
+	  :uri_vars=>[resource[:name]],
 	  :data => data
 	})
 	unless api.success? response[:code]
@@ -44,7 +45,8 @@ Puppet::Type.type(:rabbitmq_user).provide(:rabbitmq_webapi) do
   def destroy
     api = self.api
     response = api.delete({
-	  :uri => "/api/users/#{resource[:name]}",
+	  :uri => "/api/users/%s",
+	  :uri_vars=>[resource[:name]],
 	})
 	unless api.success? response[:code]
 	  raise Puppet::Error, "Failed to delete user: #{response[:code]} #{response[:body]}"
@@ -73,7 +75,8 @@ Puppet::Type.type(:rabbitmq_user).provide(:rabbitmq_webapi) do
   def get_user
     api = self.api
     response = api.get({
-	  :uri => "/api/users/#{resource[:name]}"
+	  :uri => "/api/users/%s",
+	  :uri_vars=>[resource[:name]],
 	})
   end
 
