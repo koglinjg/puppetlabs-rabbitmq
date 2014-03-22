@@ -9,6 +9,7 @@ group :development, :test do
   gem 'serverspec',              :require => false
   gem 'rspec-system-serverspec', :require => false
   gem 'pry',                     :require => false
+  gem 'json',                    :require => false
 end
 
 if puppetversion = ENV['PUPPET_GEM_VERSION']
