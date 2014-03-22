@@ -10,8 +10,6 @@ describe 'rabbitmq' do
     end
   end
 
-  end
-
   context 'on Redhat' do
     let(:facts) {{ :osfamily => 'RedHat' }}
     it 'includes rabbitmq::repo::rhel' do
