@@ -11,18 +11,18 @@ Puppet::Type.type(:rabbitmq_user_permissions).provide(:rabbitmq_webapi) do
   def users(name, vhost)
     @users = {} unless @users
     unless @users[name]
-	  @users[name] = {} 
+      @users[name] = {} 
       api = self.api
-	  response = api.get(
-	    :uri=>"/api/users/%s/permissions",
-		:uri_vars=>[name]
-		)
-	  if api.success? response[:code]
-	    permissions = response[:body].inject({}){|k,v| k[v['vhost']] = v; k }
-	    @users[name] = permissions
-	  else
-	    raise Puppet::Error, "Failed to retrieve user permissions: #{response[:code]} #{response[:body]}"
-	  end
+      response = api.get(
+        :uri=>"/api/users/%s/permissions",
+        :uri_vars=>[name]
+        )
+      if api.success? response[:code]
+        permissions = response[:body].inject({}){|k,v| k[v['vhost']] = v; k }
+        @users[name] = permissions
+      else
+        raise Puppet::Error, "Failed to retrieve user permissions: #{response[:code]} #{response[:body]}"
+      end
     end
     @users[name][vhost]
   end
@@ -39,34 +39,34 @@ Puppet::Type.type(:rabbitmq_user_permissions).provide(:rabbitmq_webapi) do
     resource[:configure_permission] ||= "''"
     resource[:read_permission]      ||= "''"
     resource[:write_permission]     ||= "''"
-	vhost = self.should_vhost
-	user = self.should_user
+    vhost = self.should_vhost
+    user = self.should_user
     api = self.api
-	response = api.put(
-	  :uri => "/api/permissions/%s/%s",
-	  :uri_vars => [vhost,user],
-	  :data => {
-	    :configure => resource[:configure_permission],
-		:read => resource[:read_permission],
-		:write => resource[:write_permission]
-	  }
-	)
-	unless @api.success? response[:code]
-	  raise Puppet::Error, "Failed to create user permissions: #{response[:code]} #{response[:body]}"
-	end
+    response = api.put(
+      :uri => "/api/permissions/%s/%s",
+      :uri_vars => [vhost,user],
+      :data => {
+        :configure => resource[:configure_permission],
+        :read => resource[:read_permission],
+        :write => resource[:write_permission]
+      }
+    )
+    unless @api.success? response[:code]
+      raise Puppet::Error, "Failed to create user permissions: #{response[:code]} #{response[:body]}"
+    end
   end
 
   def destroy
     vhost = self.should_vhost
-	user = self.should_user
+    user = self.should_user
     @api = self.api
-	response = @api.delete(
-	  :uri => "/api/permissions/%s/%s",
-	  :uri_vars => [vhost,user]
-	)
-	unless @api.success? response[:code]
-	  raise Puppet::Error, "Failed to delete user permissions: #{response[:code]} #{response[:body]}"
-	end
+    response = @api.delete(
+      :uri => "/api/permissions/%s/%s",
+      :uri_vars => [vhost,user]
+    )
+    unless @api.success? response[:code]
+      raise Puppet::Error, "Failed to delete user permissions: #{response[:code]} #{response[:body]}"
+    end
   end
 
   def exists?
