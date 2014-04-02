@@ -60,11 +60,14 @@ Puppet::Type.type(:rabbitmq_user).provide(:rabbitmq_webapi) do
   def admin
     api = self.api
     response = get_user
+    unless api.success? response[:code]
+      raise Puppet::Error, "Attempted to determine property of non-existent user: '#{resource[:name]}'"
+    end
     tags = response[:body]['tags'].split(',')
     if tags.include?('administrator')
-      return :true
+      return true
     else
-      return :false
+      return false
     end
   end
 
