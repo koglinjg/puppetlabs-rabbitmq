@@ -5,7 +5,7 @@ branches:
 language: ruby
 bundler_args: --without development
 before_script:
-  - whoami
+  - env
   - sudo rabbitmqctl status
 script: bundle exec rake spec SPEC_OPTS='--format documentation'
 rvm:
