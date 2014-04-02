@@ -9,9 +9,9 @@ describe provider_class do
     @resource = Puppet::Type::Rabbitmq_user.new(
       {:name => 'foo', :password => 'bar'}
     )
-    Kernel.system 'rabbitmqctl stop_app 2>&1 > /dev/null'
-    Kernel.system 'rabbitmqctl reset 2>&1 > /dev/null'
-    Kernel.system 'rabbitmqctl start_app 2>&1 > /dev/null'
+    Kernel.system 'sudo rabbitmqctl stop_app 2>&1 > /dev/null'
+    Kernel.system 'sudo rabbitmqctl reset 2>&1 > /dev/null'
+    Kernel.system 'sudo rabbitmqctl start_app 2>&1 > /dev/null'
     @provider = provider_class.new(@resource)
   end
   it 'should create user and set password' do
