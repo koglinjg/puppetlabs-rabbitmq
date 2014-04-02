@@ -1,3 +1,4 @@
+# encoding: utf-8
 require 'puppet'
 provider_class = Puppet::Type.type(:rabbitmq_user).provider(:rabbitmq_webapi)
 describe provider_class do
