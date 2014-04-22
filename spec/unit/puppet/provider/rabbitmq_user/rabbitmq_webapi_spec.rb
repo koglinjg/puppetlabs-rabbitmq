@@ -23,13 +23,17 @@ describe provider_class do
     @provider.exists?.should be_true
   end
   it 'shoud create user, set password and set to admin' do
+    @provider.create
+    @provider.admin.should be_false
     @resource[:admin] = 'true'
     @provider.create
     @provider.admin.should be_true
   end
   it 'should delete user' do
     @provider.create
+    @provider.exists?.should be_true
     @provider.destroy
+    @provider.exists?.should be_false
   end
   it 'should be able to set/retrieve admin value' do
     @resource[:admin] = 'true'

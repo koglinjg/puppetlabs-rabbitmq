@@ -22,8 +22,13 @@ describe provider_class do
     @provider.create
     @provider.exists?.should be_true
   end
-  it 'should create vhost with special characters' do
+  it 'should create vhost with multibyte characters' do
     @resource[:name] = 'Æthere'
+    @provider.create
+    @provider.exists?.should be_true
+  end
+    it 'should create vhost with special characters' do
+    @resource[:name] = 'My/Vhost'
     @provider.create
     @provider.exists?.should be_true
   end
@@ -32,8 +37,14 @@ describe provider_class do
     @provider.destroy
     @provider.exists?.should be_false
   end
-  it 'should delete vhost with special characters' do
+  it 'should delete vhost with multibyte characters' do
     @resource[:name] = 'Æthere'
+    @provider.create
+    @provider.destroy
+    @provider.exists?.should be_false
+  end
+  it 'should delete vhost with special characters' do
+    @resource[:name] = 'My/Vhost'
     @provider.create
     @provider.destroy
     @provider.exists?.should be_false

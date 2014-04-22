@@ -14,7 +14,7 @@ Puppet::Type.type(:rabbitmq_user_permissions).provide(:rabbitmq_webapi) do
       @users[name] = {} 
       api = self.api
       response = api.get(
-        :uri=>"/api/users/%s/permissions",
+        :uri=>'/api/users/%s/permissions',
         :uri_vars=>[name]
         )
       if api.success? response[:code]
@@ -24,6 +24,8 @@ Puppet::Type.type(:rabbitmq_user_permissions).provide(:rabbitmq_webapi) do
         raise Puppet::Error, "Failed to retrieve user permissions: #{response[:code]} #{response[:body]}"
       end
     end
+    raise Puppet::Error, 'User permissions not found in cache' if @users[name].nil?
+    raise Puppet::Error, "User permissions not found for vhost '#{vhost}' in cache" if @users[name][vhost].nil?
     @users[name][vhost]
   end
 
@@ -35,15 +37,24 @@ Puppet::Type.type(:rabbitmq_user_permissions).provide(:rabbitmq_webapi) do
     @should_vhost ||= resource[:name].split('@')[1]
   end
 
+  def defaults
+    @defaults ||= {
+        :configure_permission => '',
+        :read_permission => '',
+        :write_permission => ''
+    }
+  end
+
   def create
-    resource[:configure_permission] ||= "''"
-    resource[:read_permission]      ||= "''"
-    resource[:write_permission]     ||= "''"
+    resource[:configure_permission] ||= defaults[:configure_permission]
+    resource[:read_permission]      ||= defaults[:read_permission]
+    resource[:write_permission]     ||= defaults[:write_permission]
     vhost = self.should_vhost
     user = self.should_user
     api = self.api
+    @users.delete user unless @users.nil? || @users[user].nil?
     response = api.put(
-      :uri => "/api/permissions/%s/%s",
+      :uri => '/api/permissions/%s/%s',
       :uri_vars => [vhost,user],
       :data => {
         :configure => resource[:configure_permission],
@@ -60,8 +71,9 @@ Puppet::Type.type(:rabbitmq_user_permissions).provide(:rabbitmq_webapi) do
     vhost = self.should_vhost
     user = self.should_user
     @api = self.api
+    @users.delete user if @users[user]
     response = @api.delete(
-      :uri => "/api/permissions/%s/%s",
+      :uri => '/api/permissions/%s/%s',
       :uri_vars => [vhost,user]
     )
     unless @api.success? response[:code]
@@ -74,7 +86,7 @@ Puppet::Type.type(:rabbitmq_user_permissions).provide(:rabbitmq_webapi) do
   end
 
   def configure_permission
-    users(should_user, should_vhost)[:configure]
+    users(should_user, should_vhost)['configure']
   end
 
   def configure_permission=(perm)
@@ -82,7 +94,7 @@ Puppet::Type.type(:rabbitmq_user_permissions).provide(:rabbitmq_webapi) do
   end
 
   def read_permission
-    users(should_user, should_vhost)[:read]
+    users(should_user, should_vhost)['read']
   end
 
   def read_permission=(perm)
@@ -90,7 +102,7 @@ Puppet::Type.type(:rabbitmq_user_permissions).provide(:rabbitmq_webapi) do
   end
 
   def write_permission
-    users(should_user, should_vhost)[:write]
+    users(should_user, should_vhost)['write']
   end
 
   def write_permission=(perm)
@@ -101,9 +113,15 @@ Puppet::Type.type(:rabbitmq_user_permissions).provide(:rabbitmq_webapi) do
   def set_permissions
     unless @permissions_set
       @permissions_set = true
-      resource[:configure_permission] ||= configure_permission
-      resource[:read_permission]      ||= read_permission
-      resource[:write_permission]     ||= write_permission
+      if self.exists?.nil?
+        resource[:configure_permission] ||= defaults[:configure_permission]
+        resource[:read_permission]      ||= defaults[:read_permission]
+        resource[:write_permission]     ||= defaults[:write_permission]
+      else
+        resource[:configure_permission] = resource[:configure_permission] || configure_permission || defaults[:configure_permission]
+        resource[:read_permission]      = resource[:read_permission]      || read_permission      || defaults[:read_permission]
+        resource[:write_permission]     = resource[:write_permission]     || write_permission     || defaults[:write_permission]
+      end
       self.create
     end
   end

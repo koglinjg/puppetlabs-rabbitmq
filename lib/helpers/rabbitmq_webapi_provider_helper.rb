@@ -60,6 +60,7 @@ class Rabbitmq_webapi
     end
     request.basic_auth(@user,@password)
     #@http.set_debug_output($stdout)
+    @http.set_debug_output($stdout) if args[:debug]
     response = @http.request(request)
     result[:code] = response.code.to_i
     unless result[:code] == 204
