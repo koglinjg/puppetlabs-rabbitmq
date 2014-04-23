@@ -161,11 +161,11 @@ describe provider_class, :webapi_user_permissions => true do
     end
     it 'should throw an error when the user doesn\'t exist' do
       @vhost_provider.new(@vhost_resource).create
-      expect { @provider.create }.to raise_error(Puppet::Error, /reasonvhost_or_user_not_found/)
+      expect { @provider.create }.to raise_error(Puppet::Error, /vhost_or_user_not_found/)
     end
     it 'should throw an error when the vhost doesn\'t exist' do
       @user_provider.new(@user_resource).create
-      expect { @provider.create }.to raise_error(Puppet::Error, /reasonvhost_or_user_not_found/)
+      expect { @provider.create }.to raise_error(Puppet::Error, /vhost_or_user_not_found/)
     end
     it 'should fallback to default permissions when a permission value is undef' do
       @user_provider.new(@user_resource).create
